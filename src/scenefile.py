@@ -8,12 +8,19 @@ log = logging.getLogger(__name__)
 
 class SceneFile(object):
     """An abstract representation of a Scene File."""
-    def __init__(self, path):
+    def __init__(self, path=None):
         self.folder_path = Path()
         self.descriptor = 'main'
         self.task = None
         self.ver = 1
         self.ext = 'ma'
+        scene = pmc.system.sceneName()
+        if not path and scene:
+            path = scene
+        if not path and not scene:
+            log.warning("Unable to initialize SceneFile object from a new scene."
+                        "Please specify a path.")
+            return
         self._init_from_path(path)
 
     @property
@@ -45,3 +52,31 @@ class SceneFile(object):
             log.warning("Missing directories in path. Creating directories...")
             self.folder_path.makedirs_p()
             return pmc.system.saveAs(self.path)
+
+    def next_available_ver(self):
+        """Returns the next available version number in the folder."""
+        pattern = "{descriptor}_{task}_v*{ext}".format(
+            descriptor=self.descriptor, task=self.task, ext=self.ext)
+        matching_scenefiles = []
+        for file_ in self.folder_path.files():
+            if file_.name.fmatch(pattern):
+                matching_scenefiles.append(file_)
+        if not matching_scenefiles:
+            return 1
+        matching_scenefiles.sort(reverse=True)
+        latest_scenefile = matching_scenefiles[0]
+        latest_scenefile = latest_scenefile.name.stripext()
+        latest_version_num = int(latest_scenefile.split("_v")[-1])
+        return latest_version_num + 1
+
+    def increment_save(self):
+        """Increments the version and saves the scene file.
+
+        If the existing version of a file already exists, it should increment from the largest
+        version number available in the folder.
+
+        Returns:
+            Path: The path to the scene file if successful
+        """
+        self.ver = self.next_available_ver()
+        self.save()
