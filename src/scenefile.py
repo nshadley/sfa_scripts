@@ -59,7 +59,7 @@ class SceneFile(object):
             descriptor=self.descriptor, task=self.task, ext=self.ext)
         matching_scenefiles = []
         for file_ in self.folder_path.files():
-            if file_.name.fmatch(pattern):
+            if file_.name.fnmatch(pattern):
                 matching_scenefiles.append(file_)
         if not matching_scenefiles:
             return 1
@@ -80,3 +80,4 @@ class SceneFile(object):
         """
         self.ver = self.next_available_ver()
         self.save()
+
