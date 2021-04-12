@@ -28,22 +28,37 @@ class ScatterUI(QtWidgets.QDialog):
         self.title_lbl.setStyleSheet("font: bold 20px")
         self.header_lay = self._create_headers()
         self.line_edit_lay = self._line_edit_ui()
-        self.line_edit_lay.addLayout(self._random_scale_ui(), 2, 1)
-        self.line_edit_lay.addLayout(self._random_rotation_ui(), 3, 1)
+        self.select_btn_lay = self._create_select_buttons()
+        self.select_btn_lay.addLayout(self._random_scale_ui(), 2, 1)
+        self.select_btn_lay.addLayout(self._random_rotation_ui(), 3, 1)
         self.main_lay = QtWidgets.QVBoxLayout()
         self.main_lay.addWidget(self.title_lbl)
-        self.main_lay.addLayout(self.line_edit_lay)
+        self.main_lay.addLayout(self.select_btn_lay)
         self.scatter_btn = QtWidgets.QPushButton("Scatter")
         self.main_lay.addWidget(self.scatter_btn)
         self.setLayout(self.main_lay)
 
     def create_connections(self):
         self.scatter_btn.clicked.connect(self._scatter)
+        self.select_what_btn.clicked.connect(self._select_what)
+        self.select_where_btn.clicked.connect(self._select_where)
 
     @QtCore.Slot()
     def _scatter(self):
         self._set_scattertool_properties_from_ui()
         self.scattertool.scatter()
+
+    @QtCore.Slot()
+    def _select_what(self):
+        selected_obj = cmds.ls(sl=True, transforms=True)
+        print(selected_obj)
+        self.scatter_what_le.setText(selected_obj[0])
+        print("button works")
+
+    @QtCore.Slot()
+    def _select_where(self):
+        selected_obj = cmds.ls(sl=True, transforms=True)
+        self.scatter_where_le.setText(selected_obj[0])
 
     def _set_scattertool_properties_from_ui(self):
         self.scattertool.selected_object = self.scatter_what_le.text()
@@ -79,6 +94,14 @@ class ScatterUI(QtWidgets.QDialog):
         layout.addWidget(self.scatter_where_header_lbl, 1, 0)
         layout.addWidget(self.random_scale_header_lbl, 2, 0)
         layout.addWidget(self.random_rotation_header_lbl, 3, 0)
+        return layout
+
+    def _create_select_buttons(self):
+        self.select_what_btn = QtWidgets.QPushButton("Choose Selected Object")
+        self.select_where_btn = QtWidgets.QPushButton("Choose Selected Object")
+        layout = self._line_edit_ui()
+        layout.addWidget(self.select_what_btn, 0, 2)
+        layout.addWidget(self.select_where_btn, 1, 2)
         return layout
 
     def _random_scale_ui(self):
@@ -152,6 +175,9 @@ class ScatterTool(object):
         self.rotation_x_max = 360
         self.rotation_y_max = 360
         self.rotation_z_max = 360
+
+    def select(self):
+        pass
 
     def randomize(self):
         """Randomizes the scale and rotation within the range"""
