@@ -191,7 +191,8 @@ class ScatterTool(object):
 
     def create(self):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object + "_instance#")
-        cmds.move(self.selected_location, instance_object)
+        self.get_xyz_location()
+        cmds.move(self.x_location, self.y_location, self.z_location, instance_object)
         self.randomize()
         cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
         cmds.rotate(self.rotation_x, self.rotation_y, self.rotation_z, instance_object)
@@ -204,3 +205,8 @@ class ScatterTool(object):
         self.rotation_x = random.uniform(self.rotation_x_min, self.rotation_x_max)
         self.rotation_y = random.uniform(self.rotation_y_min, self.rotation_y_max)
         self.rotation_z = random.uniform(self.rotation_z_min, self.rotation_z_max)
+
+    def get_xyz_location(self):
+        self.x_location = cmds.getAttr(self.selected_location + ".tx")
+        self.y_location = cmds.getAttr(self.selected_location + ".ty")
+        self.z_location = cmds.getAttr(self.selected_location + ".tz")
