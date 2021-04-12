@@ -179,6 +179,7 @@ class ScatterTool(object):
 
     def create(self):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object + "_instance#")
+        cmds.move(self.selected_location, instance_object)
 
     def randomize(self):
         """Randomizes the scale and rotation within the range"""
