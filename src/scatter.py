@@ -3,6 +3,9 @@ from shiboken2 import wrapInstance
 import maya.OpenMayaUI as omui
 import maya.cmds as cmds
 import pymel.core as pmc
+import random
+
+random.seed(1234)
 
 
 def maya_main_window():
@@ -46,14 +49,12 @@ class ScatterUI(QtWidgets.QDialog):
     @QtCore.Slot()
     def _scatter(self):
         self._set_scattertool_properties_from_ui()
-        self.scattertool.scatter()
+        self.scattertool.create()
 
     @QtCore.Slot()
     def _select_what(self):
         selected_obj = cmds.ls(sl=True, transforms=True)
-        print(selected_obj)
         self.scatter_what_le.setText(selected_obj[0])
-        print("button works")
 
     @QtCore.Slot()
     def _select_where(self):
@@ -176,8 +177,8 @@ class ScatterTool(object):
         self.rotation_y_max = 360
         self.rotation_z_max = 360
 
-    def select(self):
-        pass
+    def create(self):
+        instance_object = cmds.instance(self.selected_object, name=self.selected_object + "_instance#")
 
     def randomize(self):
         """Randomizes the scale and rotation within the range"""
