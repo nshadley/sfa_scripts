@@ -180,10 +180,14 @@ class ScatterTool(object):
     def create(self):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object + "_instance#")
         cmds.move(self.selected_location, instance_object)
+        self.randomize()
+        cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
 
     def randomize(self):
         """Randomizes the scale and rotation within the range"""
-        pass
+        self.scale_x = random.uniform(self.scale_x_min, self.scale_x_max)
+        self.scale_y = random.uniform(self.scale_y_min, self.scale_y_max)
+        self.scale_z = random.uniform(self.scale_z_min, self.scale_z_max)
 
     def scatter(self):
         pass
