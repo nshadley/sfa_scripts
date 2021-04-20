@@ -44,7 +44,7 @@ class ScatterUI(QtWidgets.QDialog):
     def create_connections(self):
         self.scatter_btn.clicked.connect(self._scatter)
         self.select_what_btn.clicked.connect(self._select_what)
-        self.select_where_btn.clicked.connect(self._select_where)
+        self.select_where_objects_btn.clicked.connect(self._select_where_object)
 
     @QtCore.Slot()
     def _scatter(self):
@@ -57,7 +57,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.scatter_what_le.setText(selected_obj[0])
 
     @QtCore.Slot()
-    def _select_where(self):
+    def _select_where_object(self):
         selected_obj = cmds.ls(sl=True, transforms=True)
         self.scatter_where_le.setText(selected_obj[0])
 
@@ -98,11 +98,15 @@ class ScatterUI(QtWidgets.QDialog):
         return layout
 
     def _create_select_buttons(self):
-        self.select_what_btn = QtWidgets.QPushButton("Choose Selected Object")
-        self.select_where_btn = QtWidgets.QPushButton("Choose Selected Object")
+        self.select_what_btn = QtWidgets.QPushButton("Selected Object")
+        self.select_where_objects_btn = QtWidgets.QPushButton("Selected Object(s)")
+        self.select_where_vertices_btn = QtWidgets.QPushButton("Selected Vertices")
+        self.select_where_obj_vert_btn = QtWidgets.QPushButton("Vertices on Selected Object(s)")
         layout = self._line_edit_ui()
         layout.addWidget(self.select_what_btn, 0, 2)
-        layout.addWidget(self.select_where_btn, 1, 2)
+        layout.addWidget(self.select_where_objects_btn, 1, 2)
+        layout.addWidget(self.select_where_vertices_btn, 1, 3)
+        layout.addWidget(self.select_where_obj_vert_btn, 1, 4)
         return layout
 
     def _random_scale_ui(self):
