@@ -45,11 +45,13 @@ class ScatterUI(QtWidgets.QDialog):
         self.scatter_btn.clicked.connect(self._scatter)
         self.select_what_btn.clicked.connect(self._select_what)
         self.select_where_objects_btn.clicked.connect(self._select_where_object)
+        self.select_where_vertices_btn.clicked.connect(self._select_where_vertices)
+        self.select_where_obj_vert_btn.clicked.connect(self._select_where_obj_vert)
 
     @QtCore.Slot()
     def _scatter(self):
         self._set_scattertool_properties_from_ui()
-        self.scattertool.create()
+        self.scattertool.scatter_each()
 
     @QtCore.Slot()
     def _select_what(self):
@@ -59,11 +61,31 @@ class ScatterUI(QtWidgets.QDialog):
     @QtCore.Slot()
     def _select_where_object(self):
         selected_obj = cmds.ls(sl=True, transforms=True)
-        self.scatter_where_le.setText(selected_obj[0])
+        self.scatter_where_lw.clear()
+        for sel_obj in selected_obj:
+            self.scatter_where_lw.addItem(sel_obj)
+
+    @QtCore.Slot()
+    def _select_where_vertices(self):
+        selected_obj = cmds.ls(sl=True, flatten=True)
+        verts = cmds.polyListCompnentConversion(selected_obj, toVertex=True)
+        verts = cmds.filterExpand(verts, selectionMask=31)
+        self.scatter_where_lw.clear()
+        for vert in verts:
+            self.scatter_where_lw.addItem(vert)
+
+    @QtCore.Slot()
+    def _select_where_obj_vert(self):
+        selected_obj = cmds.ls(sl=True, transforms=True)
+        verts = cmds.polyListCompnentConversion(selected_obj, toVertex=True)
+        verts = cmds.filterExpand(verts, selectionMask=31)
+        self.scatter_where_lw.clear()
+        for vert in verts:
+            self.scatter_where_lw.addItem(vert)
 
     def _set_scattertool_properties_from_ui(self):
         self.scattertool.selected_object = self.scatter_what_le.text()
-        self.scattertool.selected_location = self.scatter_where_le.text()
+        self.scattertool.selected_location = self.scatter_where_lw.text()
         self.scattertool.scale_x_min = self.scale_min_x_btn.value()
         self.scattertool.scale_y_min = self.scale_min_y_btn.value()
         self.scattertool.scale_z_min = self.scale_min_z_btn.value()
@@ -79,10 +101,10 @@ class ScatterUI(QtWidgets.QDialog):
 
     def _line_edit_ui(self):
         self.scatter_what_le = QtWidgets.QLineEdit("Object to scatter")
-        self.scatter_where_le = QtWidgets.QLineEdit("Where to scatter")
+        self.scatter_where_lw = QtWidgets.QListWidget()
         layout = self._create_headers()
         layout.addWidget(self.scatter_what_le, 0, 1)
-        layout.addWidget(self.scatter_where_le, 1, 1)
+        layout.addWidget(self.scatter_where_lw, 1, 1)
         return layout
 
     def _create_headers(self):
@@ -99,14 +121,19 @@ class ScatterUI(QtWidgets.QDialog):
 
     def _create_select_buttons(self):
         self.select_what_btn = QtWidgets.QPushButton("Selected Object")
+        layout = self._line_edit_ui()
+        layout.addWidget(self.select_what_btn, 0, 2)
+        layout.addLayout(self._create_select_where_buttons(), 1, 2)
+        return layout
+
+    def _create_select_where_buttons(self):
         self.select_where_objects_btn = QtWidgets.QPushButton("Selected Object(s)")
         self.select_where_vertices_btn = QtWidgets.QPushButton("Selected Vertices")
         self.select_where_obj_vert_btn = QtWidgets.QPushButton("Vertices on Selected Object(s)")
-        layout = self._line_edit_ui()
-        layout.addWidget(self.select_what_btn, 0, 2)
-        layout.addWidget(self.select_where_objects_btn, 1, 2)
-        layout.addWidget(self.select_where_vertices_btn, 1, 3)
-        layout.addWidget(self.select_where_obj_vert_btn, 1, 4)
+        layout = QtWidgets.QGridLayout()
+        layout.addWidget(self.select_where_objects_btn, 0, 0)
+        layout.addWidget(self.select_where_vertices_btn, 1, 0)
+        layout.addWidget(self.select_where_obj_vert_btn, 2, 0)
         return layout
 
     def _random_scale_ui(self):
@@ -193,9 +220,9 @@ class ScatterTool(object):
         self.rotation_y_max = 360
         self.rotation_z_max = 360
 
-    def create(self):
+    def create(self, scatter_location):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object + "_instance#")
-        self.get_xyz_location()
+        self.get_xyz_location(scatter_location)
         cmds.move(self.x_location, self.y_location, self.z_location, instance_object)
         self.randomize()
         cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
@@ -210,7 +237,11 @@ class ScatterTool(object):
         self.rotation_y = random.uniform(self.rotation_y_min, self.rotation_y_max)
         self.rotation_z = random.uniform(self.rotation_z_min, self.rotation_z_max)
 
-    def get_xyz_location(self):
-        self.x_location = cmds.getAttr(self.selected_location + ".tx")
-        self.y_location = cmds.getAttr(self.selected_location + ".ty")
-        self.z_location = cmds.getAttr(self.selected_location + ".tz")
+    def get_xyz_location(self, location):
+        self.x_location = cmds.getAttr(location + ".tx")
+        self.y_location = cmds.getAttr(location + ".ty")
+        self.z_location = cmds.getAttr(location + ".tz")
+
+    def scatter_each(self):
+        for location in self.selected_location:
+            self.create(location)
