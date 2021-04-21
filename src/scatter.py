@@ -55,37 +55,40 @@ class ScatterUI(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def _select_what(self):
-        selected_obj = cmds.ls(sl=True, transforms=True)
+        selected_obj = cmds.ls(selection=True, transforms=True)
         self.scatter_what_le.setText(selected_obj[0])
 
     @QtCore.Slot()
     def _select_where_object(self):
-        selected_obj = cmds.ls(sl=True, transforms=True)
+        selected_obj = cmds.ls(selection=True, transforms=True)
         self.scatter_where_lw.clear()
         for sel_obj in selected_obj:
             self.scatter_where_lw.addItem(sel_obj)
 
     @QtCore.Slot()
     def _select_where_vertices(self):
-        selected_obj = cmds.ls(sl=True, flatten=True)
-        verts = cmds.polyListCompnentConversion(selected_obj, toVertex=True)
-        verts = cmds.filterExpand(verts, selectionMask=31)
+        selection = cmds.ls(selection=True, flatten=True)
+        selected_verts = cmds.polyListComponentConversion(selection, toVertex=True)
+        selected_verts = cmds.filterExpand(selected_verts, selectionMask=31)
         self.scatter_where_lw.clear()
-        for vert in verts:
+        for vert in selected_verts:
             self.scatter_where_lw.addItem(vert)
 
     @QtCore.Slot()
     def _select_where_obj_vert(self):
-        selected_obj = cmds.ls(sl=True, transforms=True)
-        verts = cmds.polyListCompnentConversion(selected_obj, toVertex=True)
-        verts = cmds.filterExpand(verts, selectionMask=31)
+        selection = cmds.ls(selection=True, flatten=True)
+        selected_verts = cmds.polyListComponentConversion(selection, toVertex=True)
+        selected_verts = cmds.filterExpand(selected_verts, selectionMask=31)
         self.scatter_where_lw.clear()
-        for vert in verts:
+        for vert in selected_verts:
             self.scatter_where_lw.addItem(vert)
 
     def _set_scattertool_properties_from_ui(self):
         self.scattertool.selected_object = self.scatter_what_le.text()
-        self.scattertool.selected_location = self.scatter_where_lw.text()
+        items = []
+        for x in range(self.scatter_where_lw.count()):
+            items.append(self.scatter_where_lw.item(x).text())
+        self.scattertool.selected_location = items
         self.scattertool.scale_x_min = self.scale_min_x_btn.value()
         self.scattertool.scale_y_min = self.scale_min_y_btn.value()
         self.scattertool.scale_z_min = self.scale_min_z_btn.value()
@@ -206,7 +209,7 @@ class ScatterTool(object):
 
     def __init__(self):
         self.selected_object = "pCube1"
-        self.selected_location = "pCube1"
+        self.selected_location = ["pCube1"]
         self.scale_x_min = 1.0
         self.scale_y_min = 1.0
         self.scale_z_min = 1.0
@@ -221,7 +224,7 @@ class ScatterTool(object):
         self.rotation_z_max = 360
 
     def create(self, scatter_location):
-        instance_object = cmds.instance(self.selected_object, name=self.selected_object + "_instance#")
+        instance_object = cmds.instance(self.selected_object, name=self.selected_object)
         self.get_xyz_location(scatter_location)
         cmds.move(self.x_location, self.y_location, self.z_location, instance_object)
         self.randomize()
@@ -238,9 +241,10 @@ class ScatterTool(object):
         self.rotation_z = random.uniform(self.rotation_z_min, self.rotation_z_max)
 
     def get_xyz_location(self, location):
-        self.x_location = cmds.getAttr(location + ".tx")
-        self.y_location = cmds.getAttr(location + ".ty")
-        self.z_location = cmds.getAttr(location + ".tz")
+        pointPos = cmds.pointPosition(location)
+        self.x_location = pointPos[0]
+        self.y_location = pointPos[1]
+        self.z_location = pointPos[2]
 
     def scatter_each(self):
         for location in self.selected_location:
