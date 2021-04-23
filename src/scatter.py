@@ -30,6 +30,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.title_lbl = QtWidgets.QLabel("Scatter")
         self.title_lbl.setStyleSheet("font: bold 20px")
         self.header_lay = self._create_headers()
+        self.normal_lay = self._normal_checkbox_ui()
         self.line_edit_lay = self._line_edit_ui()
         self.select_btn_lay = self._create_select_buttons()
         self.select_btn_lay.addLayout(self._random_scale_ui(), 2, 1)
@@ -37,6 +38,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.main_lay = QtWidgets.QVBoxLayout()
         self.main_lay.addWidget(self.title_lbl)
         self.main_lay.addLayout(self.select_btn_lay)
+        self.main_lay.addLayout(self.normal_lay)
         self.scatter_btn = QtWidgets.QPushButton("Scatter")
         self.main_lay.addWidget(self.scatter_btn)
         self.setLayout(self.main_lay)
@@ -108,6 +110,13 @@ class ScatterUI(QtWidgets.QDialog):
         layout = self._create_headers()
         layout.addWidget(self.scatter_what_le, 0, 1)
         layout.addWidget(self.scatter_where_lw, 1, 1)
+        return layout
+
+    def _normal_checkbox_ui(self):
+        self.normal_header_lbl = QtWidgets.QLabel("Align to normals?")
+        self.normal_chbx = QtWidgets.QCheckBox()
+        layout = QtWidgets.QFormLayout()
+        layout.addRow(self.normal_header_lbl, self.normal_chbx)
         return layout
 
     def _create_headers(self):
