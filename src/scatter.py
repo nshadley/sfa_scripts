@@ -103,6 +103,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.scattertool.rotation_x_max = self.rotation_max_x_btn.value()
         self.scattertool.rotation_y_max = self.rotation_max_y_btn.value()
         self.scattertool.rotation_z_max = self.rotation_max_z_btn.value()
+        self.scattertool.normal_aligned = self.normal_chbx.isChecked()
 
     def _line_edit_ui(self):
         self.scatter_what_le = QtWidgets.QLineEdit("Object to scatter")
@@ -231,11 +232,15 @@ class ScatterTool(object):
         self.rotation_x_max = 360
         self.rotation_y_max = 360
         self.rotation_z_max = 360
+        self.normal_aligned = False
 
     def create(self, scatter_location):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object)
         self.get_xyz_location(scatter_location)
         cmds.move(self.x_location, self.y_location, self.z_location, instance_object)
+        if self.normal_aligned:
+            constraint = cmds.normalConstraint(scatter_location, instance_object)
+            cmds.delete(constraint)
         self.randomize()
         cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
         cmds.rotate(self.rotation_x, self.rotation_y, self.rotation_z, instance_object)
