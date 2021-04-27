@@ -30,6 +30,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.title_lbl = QtWidgets.QLabel("Scatter")
         self.title_lbl.setStyleSheet("font: bold 20px")
         self.header_lay = self._create_headers()
+        self.percent_lay = self._percent_vertices_ui()
         self.normal_lay = self._normal_checkbox_ui()
         self.line_edit_lay = self._line_edit_ui()
         self.select_btn_lay = self._create_select_buttons()
@@ -38,6 +39,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.main_lay = QtWidgets.QVBoxLayout()
         self.main_lay.addWidget(self.title_lbl)
         self.main_lay.addLayout(self.select_btn_lay)
+        self.main_lay.addLayout(self.percent_lay)
         self.main_lay.addLayout(self.normal_lay)
         self.scatter_btn = QtWidgets.QPushButton("Scatter")
         self.main_lay.addWidget(self.scatter_btn)
@@ -104,6 +106,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.scattertool.rotation_y_max = self.rotation_max_y_btn.value()
         self.scattertool.rotation_z_max = self.rotation_max_z_btn.value()
         self.scattertool.normal_aligned = self.normal_chbx.isChecked()
+        self.scattertool.percent_to_scatter = self.percent_sbx.value()
 
     def _line_edit_ui(self):
         self.scatter_what_le = QtWidgets.QLineEdit("Object to scatter")
@@ -111,6 +114,14 @@ class ScatterUI(QtWidgets.QDialog):
         layout = self._create_headers()
         layout.addWidget(self.scatter_what_le, 0, 1)
         layout.addWidget(self.scatter_where_lw, 1, 1)
+        return layout
+
+    def _percent_vertices_ui(self):
+        self.percent_lbl = QtWidgets.QLabel("Percent to Scatter")
+        self.percent_sbx = QtWidgets.QSpinBox()
+        self.percent_sbx.setRange(1, 100)
+        layout = QtWidgets.QFormLayout()
+        layout.addRow(self.percent_lbl, self.percent_sbx)
         return layout
 
     def _normal_checkbox_ui(self):
@@ -156,17 +167,17 @@ class ScatterUI(QtWidgets.QDialog):
         self.scale_min_lbl = QtWidgets.QLabel("Min")
         self.scale_max_lbl = QtWidgets.QLabel("Max")
         self.scale_min_x_btn = QtWidgets.QDoubleSpinBox()
-        self.scale_min_x_btn.setRange(1, 100)
+        self.scale_min_x_btn.setRange(0.1, 100)
         self.scale_min_y_btn = QtWidgets.QDoubleSpinBox()
-        self.scale_min_y_btn.setRange(1, 100)
+        self.scale_min_y_btn.setRange(0.1, 100)
         self.scale_min_z_btn = QtWidgets.QDoubleSpinBox()
-        self.scale_min_z_btn.setRange(1, 100)
+        self.scale_min_z_btn.setRange(0.1, 100)
         self.scale_max_x_btn = QtWidgets.QDoubleSpinBox()
-        self.scale_max_x_btn.setRange(1, 100)
+        self.scale_max_x_btn.setRange(0.1, 100)
         self.scale_max_y_btn = QtWidgets.QDoubleSpinBox()
-        self.scale_max_y_btn.setRange(1, 100)
+        self.scale_max_y_btn.setRange(0.1, 100)
         self.scale_max_z_btn = QtWidgets.QDoubleSpinBox()
-        self.scale_max_z_btn.setRange(1, 100)
+        self.scale_max_z_btn.setRange(0.1, 100)
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.scale_x_lbl, 0, 1)
         layout.addWidget(self.scale_y_lbl, 0, 2)
@@ -232,6 +243,7 @@ class ScatterTool(object):
         self.rotation_x_max = 360
         self.rotation_y_max = 360
         self.rotation_z_max = 360
+        self.percent_to_scatter = 100
         self.normal_aligned = False
 
     def create(self, scatter_location):
@@ -239,8 +251,9 @@ class ScatterTool(object):
         self.get_xyz_location(scatter_location)
         cmds.move(self.x_location, self.y_location, self.z_location, instance_object)
         if self.normal_aligned:
-            constraint = cmds.normalConstraint(scatter_location, instance_object)
-            cmds.delete(constraint)
+            constraint = cmds.normalConstraint(scatter_location, instance_object, aimVector=[0.0, 1.0, 0.0])
+            #seems to only show after a move or rotation has occured
+            #cmds.delete(constraint)
         self.randomize()
         cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
         cmds.rotate(self.rotation_x, self.rotation_y, self.rotation_z, instance_object)
