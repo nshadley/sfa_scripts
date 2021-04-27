@@ -274,5 +274,8 @@ class ScatterTool(object):
         self.z_location = pointPos[2]
 
     def scatter_each(self):
-        for location in self.selected_location:
+        multiplier = self.percent_to_scatter/100.0
+        amount = int(round(len(self.selected_location) * multiplier))
+        selected_verts = random.sample(self.selected_location, k=amount)
+        for location in selected_verts:
             self.create(location)
