@@ -34,8 +34,6 @@ class ScatterUI(QtWidgets.QDialog):
         self.normal_lay = self._normal_checkbox_ui()
         self.line_edit_lay = self._line_edit_ui()
         self.select_btn_lay = self._create_select_buttons()
-        self.select_btn_lay.addLayout(self._random_scale_ui(), 2, 1)
-        self.select_btn_lay.addLayout(self._random_rotation_ui(), 3, 1)
         self.main_lay = QtWidgets.QVBoxLayout()
         self.main_lay.addWidget(self.title_lbl)
         self.main_lay.addLayout(self.select_btn_lay)
@@ -131,16 +129,50 @@ class ScatterUI(QtWidgets.QDialog):
         layout.addRow(self.normal_header_lbl, self.normal_chbx)
         return layout
 
+    def _random_location_ui(self):
+        self.location_x_lbl = QtWidgets.QLabel("x")
+        self.location_y_lbl = QtWidgets.QLabel("y")
+        self.location_z_lbl = QtWidgets.QLabel("z")
+        self.location_min_lbl = QtWidgets.QLabel("Min")
+        self.location_max_lbl = QtWidgets.QLabel("Max")
+        self.location_min_x_btn = QtWidgets.QDoubleSpinBox()
+        self.location_min_x_btn.setRange(-5, 5)
+        self.location_min_y_btn = QtWidgets.QDoubleSpinBox()
+        self.location_min_y_btn.setRange(-5, 5)
+        self.location_min_z_btn = QtWidgets.QDoubleSpinBox()
+        self.location_min_z_btn.setRange(-5, 5)
+        self.location_max_x_btn = QtWidgets.QDoubleSpinBox()
+        self.location_max_x_btn.setRange(-5, 5)
+        self.location_max_y_btn = QtWidgets.QDoubleSpinBox()
+        self.location_max_y_btn.setRange(-5, 5)
+        self.location_max_z_btn = QtWidgets.QDoubleSpinBox()
+        self.location_max_z_btn.setRange(-5, 5)
+        layout = QtWidgets.QGridLayout()
+        layout.addWidget(self.location_x_lbl, 0, 1)
+        layout.addWidget(self.location_y_lbl, 0, 2)
+        layout.addWidget(self.location_z_lbl, 0, 3)
+        layout.addWidget(self.location_min_lbl, 1, 0)
+        layout.addWidget(self.location_max_lbl, 2, 0)
+        layout.addWidget(self.location_min_x_btn, 1, 1)
+        layout.addWidget(self.location_min_y_btn, 1, 2)
+        layout.addWidget(self.location_min_z_btn, 1, 3)
+        layout.addWidget(self.location_max_x_btn, 2, 1)
+        layout.addWidget(self.location_max_y_btn, 2, 2)
+        layout.addWidget(self.location_max_z_btn, 2, 3)
+        return layout
+
     def _create_headers(self):
         self.scatter_what_header_lbl = QtWidgets.QLabel("Scatter What")
         self.scatter_where_header_lbl = QtWidgets.QLabel("Scatter Where")
         self.random_scale_header_lbl = QtWidgets.QLabel("Random Scale")
         self.random_rotation_header_lbl = QtWidgets.QLabel("Random Rotation")
+        self.random_location_header_lbl = QtWidgets.QLabel("Random Location Offset")
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.scatter_what_header_lbl, 0, 0)
         layout.addWidget(self.scatter_where_header_lbl, 1, 0)
         layout.addWidget(self.random_scale_header_lbl, 2, 0)
         layout.addWidget(self.random_rotation_header_lbl, 3, 0)
+        layout.addWidget(self.random_location_header_lbl, 4, 0)
         return layout
 
     def _create_select_buttons(self):
@@ -148,6 +180,9 @@ class ScatterUI(QtWidgets.QDialog):
         layout = self._line_edit_ui()
         layout.addWidget(self.select_what_btn, 0, 2)
         layout.addLayout(self._create_select_where_buttons(), 1, 2)
+        layout.addLayout(self._random_scale_ui(), 2, 1)
+        layout.addLayout(self._random_rotation_ui(), 3, 1)
+        layout.addLayout(self._random_location_ui(), 4, 1)
         return layout
 
     def _create_select_where_buttons(self):
@@ -245,6 +280,15 @@ class ScatterTool(object):
         self.rotation_z_max = 360
         self.percent_to_scatter = 100
         self.normal_aligned = False
+        self.location_x_min = 0.0
+        self.location_y_min = 0.0
+        self.location_z_min = 0.0
+        self.location_x_max = 0.0
+        self.location_y_max = 0.0
+        self.location_z_max = 0.0
+        self.x_location_offset = 0.0
+        self.y_location_offset = 0.0
+        self.z_location_offset = 0.0
 
     def create(self, scatter_location):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object)
