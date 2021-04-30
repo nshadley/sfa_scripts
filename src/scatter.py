@@ -105,6 +105,12 @@ class ScatterUI(QtWidgets.QDialog):
         self.scattertool.rotation_z_max = self.rotation_max_z_btn.value()
         self.scattertool.normal_aligned = self.normal_chbx.isChecked()
         self.scattertool.percent_to_scatter = self.percent_sbx.value()
+        self.scattertool.location_x_max = self.location_max_x_btn.value()
+        self.scattertool.location_y_max = self.location_max_y_btn.value()
+        self.scattertool.location_z_max = self.location_max_z_btn.value()
+        self.scattertool.location_x_min = self.location_min_x_btn.value()
+        self.scattertool.location_y_min = self.location_min_y_btn.value()
+        self.scattertool.location_z_min = self.location_min_z_btn.value()
 
     def _line_edit_ui(self):
         self.scatter_what_le = QtWidgets.QLineEdit("Object to scatter")
@@ -136,17 +142,17 @@ class ScatterUI(QtWidgets.QDialog):
         self.location_min_lbl = QtWidgets.QLabel("Min")
         self.location_max_lbl = QtWidgets.QLabel("Max")
         self.location_min_x_btn = QtWidgets.QDoubleSpinBox()
-        self.location_min_x_btn.setRange(-5, 5)
+        self.location_min_x_btn.setRange(-100, 100)
         self.location_min_y_btn = QtWidgets.QDoubleSpinBox()
-        self.location_min_y_btn.setRange(-5, 5)
+        self.location_min_y_btn.setRange(-100, 100)
         self.location_min_z_btn = QtWidgets.QDoubleSpinBox()
-        self.location_min_z_btn.setRange(-5, 5)
+        self.location_min_z_btn.setRange(-100, 100)
         self.location_max_x_btn = QtWidgets.QDoubleSpinBox()
-        self.location_max_x_btn.setRange(-5, 5)
+        self.location_max_x_btn.setRange(-100, 100)
         self.location_max_y_btn = QtWidgets.QDoubleSpinBox()
-        self.location_max_y_btn.setRange(-5, 5)
+        self.location_max_y_btn.setRange(-100, 100)
         self.location_max_z_btn = QtWidgets.QDoubleSpinBox()
-        self.location_max_z_btn.setRange(-5, 5)
+        self.location_max_z_btn.setRange(-100, 100)
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.location_x_lbl, 0, 1)
         layout.addWidget(self.location_y_lbl, 0, 2)
@@ -301,15 +307,20 @@ class ScatterTool(object):
         self.randomize()
         cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
         cmds.rotate(self.rotation_x, self.rotation_y, self.rotation_z, instance_object)
+        cmds.move(self.x_location + self.x_location_offset, self.y_location + self.y_location_offset,
+                  self.z_location + self.z_location_offset, instance_object)
 
     def randomize(self):
-        """Randomizes the scale and rotation within the range"""
+        """Randomizes the scale, rotation, and location within the range"""
         self.scale_x = random.uniform(self.scale_x_min, self.scale_x_max)
         self.scale_y = random.uniform(self.scale_y_min, self.scale_y_max)
         self.scale_z = random.uniform(self.scale_z_min, self.scale_z_max)
         self.rotation_x = random.uniform(self.rotation_x_min, self.rotation_x_max)
         self.rotation_y = random.uniform(self.rotation_y_min, self.rotation_y_max)
         self.rotation_z = random.uniform(self.rotation_z_min, self.rotation_z_max)
+        self.x_location_offset = random.uniform(self.location_x_min, self.location_x_max)
+        self.y_location_offset = random.uniform(self.location_y_min, self.location_y_max)
+        self.y_location_offset = random.uniform(self.location_z_min, self.location_z_max)
 
     def get_xyz_location(self, location):
         pointPos = cmds.pointPosition(location)
