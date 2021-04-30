@@ -27,7 +27,7 @@ class ScatterUI(QtWidgets.QDialog):
         self.create_connections()
 
     def create_ui(self):
-        self.title_lbl = QtWidgets.QLabel("Scatter")
+        self.title_lbl = QtWidgets.QLabel("Scatter Tool")
         self.title_lbl.setStyleSheet("font: bold 20px")
         self.header_lay = self._create_headers()
         self.percent_lay = self._percent_vertices_ui()
@@ -122,6 +122,7 @@ class ScatterUI(QtWidgets.QDialog):
 
     def _percent_vertices_ui(self):
         self.percent_lbl = QtWidgets.QLabel("Percent to Scatter")
+        self.percent_lbl.setStyleSheet("font: bold")
         self.percent_sbx = QtWidgets.QSpinBox()
         self.percent_sbx.setRange(1, 100)
         layout = QtWidgets.QFormLayout()
@@ -130,6 +131,7 @@ class ScatterUI(QtWidgets.QDialog):
 
     def _normal_checkbox_ui(self):
         self.normal_header_lbl = QtWidgets.QLabel("Align to normals?")
+        self.normal_header_lbl.setStyleSheet("font: bold")
         self.normal_chbx = QtWidgets.QCheckBox()
         layout = QtWidgets.QFormLayout()
         layout.addRow(self.normal_header_lbl, self.normal_chbx)
@@ -169,10 +171,15 @@ class ScatterUI(QtWidgets.QDialog):
 
     def _create_headers(self):
         self.scatter_what_header_lbl = QtWidgets.QLabel("Scatter What")
+        self.scatter_what_header_lbl.setStyleSheet("font: bold")
         self.scatter_where_header_lbl = QtWidgets.QLabel("Scatter Where")
+        self.scatter_where_header_lbl.setStyleSheet("font: bold")
         self.random_scale_header_lbl = QtWidgets.QLabel("Random Scale")
+        self.random_scale_header_lbl.setStyleSheet("font: bold")
         self.random_rotation_header_lbl = QtWidgets.QLabel("Random Rotation")
+        self.random_rotation_header_lbl.setStyleSheet("font: bold")
         self.random_location_header_lbl = QtWidgets.QLabel("Random Location Offset")
+        self.random_location_header_lbl.setStyleSheet("font: bold")
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.scatter_what_header_lbl, 0, 0)
         layout.addWidget(self.scatter_where_header_lbl, 1, 0)
