@@ -246,17 +246,17 @@ class ScatterUI(QtWidgets.QDialog):
         self.rotation_z_lbl = QtWidgets.QLabel("z")
         self.rotation_min_lbl = QtWidgets.QLabel("Min")
         self.rotation_max_lbl = QtWidgets.QLabel("Max")
-        self.rotation_min_x_btn = QtWidgets.QSpinBox()
+        self.rotation_min_x_btn = QtWidgets.QDoubleSpinBox()
         self.rotation_min_x_btn.setRange(0, 360)
-        self.rotation_min_y_btn = QtWidgets.QSpinBox()
+        self.rotation_min_y_btn = QtWidgets.QDoubleSpinBox()
         self.rotation_min_y_btn.setRange(0, 360)
-        self.rotation_min_z_btn = QtWidgets.QSpinBox()
+        self.rotation_min_z_btn = QtWidgets.QDoubleSpinBox()
         self.rotation_min_z_btn.setRange(0, 360)
-        self.rotation_max_x_btn = QtWidgets.QSpinBox()
+        self.rotation_max_x_btn = QtWidgets.QDoubleSpinBox()
         self.rotation_max_x_btn.setRange(0, 360)
-        self.rotation_max_y_btn = QtWidgets.QSpinBox()
+        self.rotation_max_y_btn = QtWidgets.QDoubleSpinBox()
         self.rotation_max_y_btn.setRange(0, 360)
-        self.rotation_max_z_btn = QtWidgets.QSpinBox()
+        self.rotation_max_z_btn = QtWidgets.QDoubleSpinBox()
         self.rotation_max_z_btn.setRange(0, 360)
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.rotation_x_lbl, 0, 1)
@@ -285,12 +285,12 @@ class ScatterTool(object):
         self.scale_x_max = 10.0
         self.scale_y_max = 10.0
         self.scale_z_max = 10.0
-        self.rotation_x_min = 0
-        self.rotation_y_min = 0
-        self.rotation_z_min = 0
-        self.rotation_x_max = 360
-        self.rotation_y_max = 360
-        self.rotation_z_max = 360
+        self.rotation_x_min = 0.0
+        self.rotation_y_min = 0.0
+        self.rotation_z_min = 0.0
+        self.rotation_x_max = 360.0
+        self.rotation_y_max = 360.0
+        self.rotation_z_max = 360.0
         self.percent_to_scatter = 100
         self.normal_aligned = False
         self.location_x_min = 0.0
