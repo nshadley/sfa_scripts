@@ -64,6 +64,7 @@ class ScatterUI(QtWidgets.QDialog):
     def _select_where_object(self):
         selected_obj = cmds.ls(selection=True, transforms=True)
         self.scatter_where_lw.clear()
+        self.scattertool.vertices_selected = False
         for sel_obj in selected_obj:
             self.scatter_where_lw.addItem(sel_obj)
 
@@ -73,6 +74,7 @@ class ScatterUI(QtWidgets.QDialog):
         selected_verts = cmds.polyListComponentConversion(selection, toVertex=True)
         selected_verts = cmds.filterExpand(selected_verts, selectionMask=31)
         self.scatter_where_lw.clear()
+        self.scattertool.vertices_selected = True
         for vert in selected_verts:
             self.scatter_where_lw.addItem(vert)
 
@@ -82,6 +84,7 @@ class ScatterUI(QtWidgets.QDialog):
         selected_verts = cmds.polyListComponentConversion(selection, toVertex=True)
         selected_verts = cmds.filterExpand(selected_verts, selectionMask=31)
         self.scatter_where_lw.clear()
+        self.scatterool.vertices_selected = True
         for vert in selected_verts:
             self.scatter_where_lw.addItem(vert)
 
@@ -302,6 +305,7 @@ class ScatterTool(object):
         self.x_location_offset = 0.0
         self.y_location_offset = 0.0
         self.z_location_offset = 0.0
+        self.vertices_selected = True
 
     def create(self, scatter_location):
         instance_object = cmds.instance(self.selected_object, name=self.selected_object)
@@ -309,7 +313,6 @@ class ScatterTool(object):
         cmds.move(self.x_location, self.y_location, self.z_location, instance_object)
         if self.normal_aligned:
             constraint = cmds.normalConstraint(scatter_location, instance_object, aimVector=[0.0, 1.0, 0.0])
-            #seems to only show after a move or rotation has occured
             #cmds.delete(constraint)
         self.randomize()
         cmds.scale(self.scale_x, self.scale_y, self.scale_z, instance_object)
@@ -330,10 +333,16 @@ class ScatterTool(object):
         self.y_location_offset = random.uniform(self.location_z_min, self.location_z_max)
 
     def get_xyz_location(self, location):
-        pointPos = cmds.pointPosition(location)
-        self.x_location = pointPos[0]
-        self.y_location = pointPos[1]
-        self.z_location = pointPos[2]
+        if(self.vertices_selected):
+            pointPos = cmds.pointPosition(location)
+            self.x_location = pointPos[0]
+            self.y_location = pointPos[1]
+            self.z_location = pointPos[2]
+        else:
+            self.x_location = cmds.getAttr(location + ".translateX")
+            self.y_location = cmds.getAttr(location + ".translateY")
+            self.z_location = cmds.getAttr(location + ".translateZ")
+
 
     def scatter_each(self):
         multiplier = self.percent_to_scatter/100.0
